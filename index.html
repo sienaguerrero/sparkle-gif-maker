@@ -1,0 +1,1161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sparkle GIF Maker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bungee&family=Chewy&family=Great+Vibes&family=Lobster&family=Monoton&family=Pacifico&family=Press+Start+2P&family=Rubik+Bubbles&family=Silkscreen&display=swap">
+<style>
+:root{
+  --ink:#2a1650;--ink-soft:#6d5596;--pink:#ff4fa8;--hot:#ff2d95;--lilac:#b79bff;--line:#e2d3ff;
+  --check:conic-gradient(#efe4fb 25%,#fff 0 50%,#efe4fb 0 75%,#fff 0) 0 0/14px 14px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:#f6dcf3}
+body{
+  margin:0;min-height:100vh;color:var(--ink);font:14px/1.45 Verdana,Tahoma,Geneva,sans-serif;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cg fill='white'%3E%3Cpath d='M24 8Q25 23 40 24Q25 25 24 40Q23 25 8 24Q23 23 24 8Z' opacity='.85'/%3E%3Cpath d='M112 70Q112.6 77.4 120 78Q112.6 78.6 112 86Q111.4 78.6 104 78Q111.4 77.4 112 70Z' opacity='.7'/%3E%3Cpath d='M138 128Q138.5 133.5 144 134Q138.5 134.5 138 140Q137.5 134.5 132 134Q137.5 133.5 138 128Z' opacity='.8'/%3E%3Ccircle cx='70' cy='132' r='1.8' opacity='.8'/%3E%3Ccircle cx='140' cy='22' r='1.3'/%3E%3Ccircle cx='60' cy='60' r='1' opacity='.7'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(160deg,#ffd3ee 0%,#e4d3ff 48%,#c6eaff 100%);
+  background-attachment:scroll,fixed;
+}
+.win{max-width:1080px;margin:28px auto 14px;background:#fff9fdd9;border:2px solid #fff;border-radius:16px;box-shadow:0 0 0 3px #d6c2ff,0 18px 50px #6a2fa033;overflow:hidden}
+.titlebar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:linear-gradient(#fff,#ebe8f3 45%,#d2d5e0 50%,#eff1f6);border-bottom:1px solid #bab4cd;font:12px/1 "Silkscreen",monospace;color:#4a3a6a}
+.dots{display:flex;gap:6px}
+.dots i{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 18%,transparent 42%),var(--c);border:1px solid #0002;box-shadow:inset 0 -2px 3px #0002}
+.dots i:nth-child(1){--c:#ff6fb5}.dots i:nth-child(2){--c:#c7a6ff}.dots i:nth-child(3){--c:#7fe8c8}
+.titlebar .title{flex:1;text-align:center;letter-spacing:.5px}
+.marquee{overflow:hidden;white-space:nowrap;background:#2a1650;color:#ffe3f4;font:12px/1 "Silkscreen",monospace;padding:7px 0}
+.marquee span{display:inline-block;padding-left:100%;animation:marq 26s linear infinite}
+@keyframes marq{to{transform:translateX(-100%)}}
+.hero{text-align:center;padding:22px 16px 4px}
+.title-row{display:flex;align-items:center;justify-content:center;gap:14px}
+h1{margin:0;font:400 clamp(28px,6vw,54px)/1.08 "Audiowide",Verdana,sans-serif;letter-spacing:1px;
+  background:linear-gradient(180deg,#fff 0%,#ffd0ec 38%,#ff3d9e 52%,#ff9fd2 72%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:1px #b8157a;filter:drop-shadow(0 3px 0 #7b2cbf) drop-shadow(0 6px 10px #ff4fa855)}
+.tw{font-size:clamp(20px,4vw,30px);color:#fff;text-shadow:0 0 8px #ff4fa8,0 0 2px #fff;animation:tw 1.6s ease-in-out infinite}
+.tw:last-child{animation-delay:.8s}
+@keyframes tw{50%{transform:scale(.55) rotate(45deg);opacity:.6}}
+.tag{margin:8px 0 0;font:12px/1.4 "Silkscreen",monospace;color:var(--ink-soft);letter-spacing:.5px}
+.main{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;padding:18px 22px 26px}
+.stage{position:sticky;top:16px;align-self:start}
+.frame{padding:10px;border-radius:14px;background:linear-gradient(135deg,#fff,#e8e9f0 40%,#b9bfcc 50%,#f4f5f9);box-shadow:inset 0 1px 0 #fff,0 4px 14px #5a2a9033}
+.canvas-wrap{display:grid;place-items:center;min-height:240px;padding:14px;border-radius:8px;background:#f7f1fd;border:1px solid #c9c2da;overflow:hidden}
+.canvas-wrap.drop{outline:3px dashed var(--pink);outline-offset:-8px}
+#preview{display:block;background:var(--check);cursor:crosshair;box-shadow:0 2px 10px #2a165033}
+#preview.px{image-rendering:pixelated}
+.hint{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 10px;margin:10px 0 0;font-size:12px;color:var(--ink-soft);text-align:center}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+.result{margin-top:16px;padding:14px;border-radius:14px;border:2px dashed #ff9fd2;background:#fff;text-align:center}
+.result img{display:block;margin:0 auto;max-width:100%;background:var(--check)}
+.result img.px{image-rendering:pixelated}
+.result-meta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:12px;font-size:12px;color:var(--ink-soft)}
+fieldset{border:2px solid var(--line);border-radius:14px;margin:0 0 16px;padding:10px 14px 14px;background:#ffffffb8;min-width:0}
+legend{padding:3px 12px;border-radius:999px;background:linear-gradient(#fff,#ffd3ec 50%,#ffb6df 51%,#ffe4f3);border:1px solid #f39ccc;font:12px/1.2 "Silkscreen",monospace;color:#8a1461;letter-spacing:.5px}
+.field{margin:10px 0 0;min-width:0}
+.field>label,.lbl{display:flex;justify-content:space-between;gap:8px;font-size:11px;font-weight:bold;color:var(--ink-soft);margin:0 0 5px;letter-spacing:.3px}
+.field>label small{font-weight:normal}
+output{font-weight:normal;color:var(--hot)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
+.row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;align-items:end}
+textarea,input[type=number],select{width:100%;font:inherit;color:var(--ink);background:#fff;border:1px solid #cbb8f0;border-radius:8px;padding:7px 9px;box-shadow:inset 0 1px 3px #6a3fa022}
+textarea{font-size:16px;resize:vertical;min-height:58px}
+input[type=color]{display:block;width:100%;height:34px;padding:2px 3px;border:1px solid #cbb8f0;border-radius:8px;background:#fff;cursor:pointer}
+input[type=range]{width:100%;accent-color:var(--pink);margin:2px 0}
+textarea:focus,input:focus-visible,select:focus-visible{outline:3px solid #b79bff;outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{appearance:none;display:inline-flex;align-items:center;border:1px solid #cdbdf0;background:linear-gradient(#fff,#f3eefe);border-radius:999px;padding:5px 11px;font:12px/1.2 Verdana,sans-serif;color:var(--ink);cursor:pointer;box-shadow:inset 0 1px 0 #fff,0 1px 2px #5a2a9022}
+.chip:hover{border-color:var(--pink)}
+.chip[aria-pressed=true]{background:linear-gradient(#ffd6ee,#ff9bd0 50%,#ff6bb9 51%,#ffc1e3);border-color:#e0408f;color:#4d0832;box-shadow:0 0 0 2px #ffb3dc,0 0 10px #ff4fa880}
+.chip .sw{display:inline-block;width:14px;height:14px;margin-right:6px;border-radius:50%;border:1px solid #0003;box-shadow:inset 0 0 0 1px #fff8}
+.btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #c2187a;border-radius:999px;padding:9px 18px;color:#fff;font:bold 14px/1 Verdana,sans-serif;text-decoration:none;cursor:pointer;text-shadow:0 1px 0 #9a0a5a;
+  background:linear-gradient(#ffc2e4 0%,#ff6cb8 48%,#ff2d95 52%,#ff8fd0 100%);box-shadow:inset 0 1px 0 #ffffffcc,inset 0 -2px 6px #ffffff55,0 3px 8px #c2187a55}
+.btn:hover{filter:brightness(1.06) saturate(1.1)}
+.btn:active{transform:translateY(1px)}
+.btn.alt{border-color:#5b3fc4;text-shadow:0 1px 0 #3a1f9a;background:linear-gradient(#e3d8ff,#a98bff 48%,#7c5cff 52%,#b9a4ff)}
+.btn.ghost{color:var(--ink);text-shadow:none;border-color:#cdbdf0;background:linear-gradient(#fff,#f1ecfb 50%,#e6def8 51%,#f7f4fd);box-shadow:inset 0 1px 0 #fff,0 2px 5px #5a2a9022}
+.btn.small{padding:7px 13px;font-size:12px}
+.btn.big{font-size:17px;padding:13px 26px}
+.btn:disabled{opacity:.55;cursor:default;filter:none;transform:none}
+.btn:focus-visible,.chip:focus-visible{outline:3px solid #7c5cff;outline-offset:2px}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.foot{text-align:center;font-size:12px;line-height:1.8;color:var(--ink-soft);padding:4px 16px 30px}
+.counter{display:inline-block;font:13px/1 "Silkscreen",monospace;background:#120838;color:#7dffb2;padding:4px 6px;border-radius:4px;letter-spacing:3px;box-shadow:inset 0 0 6px #000}
+.trail{position:fixed;z-index:99;pointer-events:none;font-size:14px;line-height:1;text-shadow:0 0 6px currentColor;animation:fall .9s ease-out forwards}
+@keyframes fall{to{transform:translate(var(--dx),26px) scale(.3) rotate(90deg);opacity:0}}
+@media (max-width:860px){
+  .main{grid-template-columns:1fr;padding:14px 16px 22px}
+  .stage{position:static}
+}
+@media (max-width:600px){
+  .win{margin:10px 8px;border-radius:12px}
+  .canvas-wrap{padding:8px;min-height:160px}
+}
+@media (max-width:420px){
+  .row3{grid-template-columns:1fr 1fr}
+  .row3 .field:first-child{grid-column:1/-1}
+}
+@media (prefers-reduced-motion:reduce){
+  .marquee span{animation:none;padding-left:16px}
+  .tw{animation:none}
+  .trail{display:none}
+}
+</style>
+</head>
+<body>
+<main class="win">
+  <div class="titlebar">
+    <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="title">sparkle_gif_maker.exe</span>
+    <span aria-hidden="true">✦</span>
+  </div>
+  <div class="marquee" aria-hidden="true"><span>★ welcome 2 the sparkle gif maker ★ glitter text ★ twinkly stars ★ real animated .gif files ★ no sign up ★ no watermark ★ 4 ur blog, ur page, ur bff ★</span></div>
+  <header class="hero">
+    <div class="title-row"><span class="tw" aria-hidden="true">✦</span><h1>Sparkle GIF Maker</h1><span class="tw" aria-hidden="true">✦</span></div>
+    <p class="tag">type it ✦ bling it ✦ save it</p>
+  </header>
+
+  <div class="main">
+    <section class="stage" aria-label="Preview">
+      <div class="frame">
+        <div class="canvas-wrap" id="wrap">
+          <canvas id="preview" width="400" height="200" role="img" aria-label="Animated preview of your sparkle GIF"></canvas>
+        </div>
+      </div>
+      <p class="hint">
+        <span>click the preview to stick a sparkle</span><span>·</span><span>shift+click to unstick</span><span>·</span><span>drop a photo on it</span>
+        <button type="button" class="chip" id="pause" aria-pressed="false">⏸ pause</button>
+      </p>
+      <div class="actions">
+        <button type="button" class="btn big" id="make">✨ make my gif ✨</button>
+        <button type="button" class="btn alt" id="surprise">🎲 surprise me</button>
+      </div>
+      <div class="result" id="result" hidden>
+        <img id="out" alt="Your finished sparkle GIF">
+        <div class="result-meta"><span id="meta"></span><a class="btn small" id="dl" download="sparkle.gif">💾 save gif</a></div>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Settings">
+      <fieldset>
+        <legend>✧ words ✧</legend>
+        <div class="field">
+          <label for="text">your text <small>enter makes a new line</small></label>
+          <textarea id="text" data-k="text" rows="2" maxlength="80" spellcheck="false"></textarea>
+        </div>
+        <div class="field"><span class="lbl" id="l-font">font</span><div class="chips" data-group="font" role="group" aria-labelledby="l-font"></div></div>
+        <div class="field"><span class="lbl" id="l-fill">fill</span><div class="chips" data-group="fill" role="group" aria-labelledby="l-fill"></div></div>
+        <div class="row">
+          <div class="field"><label for="scale">text size <output id="o-scale"></output></label><input type="range" id="scale" data-k="scale" min="30" max="100" step="1"></div>
+          <div class="field"><label for="grain">glitter grain <output id="o-grain"></output></label><input type="range" id="grain" data-k="grain" min="1" max="4" step="1"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="outline">outline <output id="o-outline"></output></label><input type="range" id="outline" data-k="outline" min="0" max="10" step="1"></div>
+          <div class="field"><label for="outlineColor">outline color</label><input type="color" id="outlineColor" data-k="outlineColor"></div>
+        </div>
+        <div class="field"><span class="lbl" id="l-effect">effect</span><div class="chips" data-group="effect" role="group" aria-labelledby="l-effect"></div></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>✧ sparkles ✧</legend>
+        <div class="field"><span class="lbl" id="l-shape">shape</span><div class="chips" data-group="shape" role="group" aria-labelledby="l-shape"></div></div>
+        <div class="field"><span class="lbl" id="l-scolor">color</span><div class="chips" data-group="sColor" role="group" aria-labelledby="l-scolor"></div></div>
+        <div class="row">
+          <div class="field"><label for="amount">how many <output id="o-amount"></output></label><input type="range" id="amount" data-k="amount" min="0" max="40" step="1"></div>
+          <div class="field"><label for="sSize">how big <output id="o-sSize"></output></label><input type="range" id="sSize" data-k="sSize" min="4" max="64" step="1"></div>
+        </div>
+        <div class="field"><span class="lbl" id="l-where">where</span><div class="chips" data-group="where" role="group" aria-labelledby="l-where"></div></div>
+        <div class="btnrow">
+          <button type="button" class="btn small alt" id="shuffle">🔀 reshuffle</button>
+          <button type="button" class="btn small ghost" id="unstick" disabled>unstick all</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>✧ background ✧</legend>
+        <div class="field"><span class="lbl" id="l-bg">type</span><div class="chips" data-group="bg" role="group" aria-labelledby="l-bg"></div></div>
+        <div class="field" data-show="color photo"><label for="bgColor">color</label><input type="color" id="bgColor" data-k="bgColor"></div>
+        <div class="field" data-show="gradient"><span class="lbl" id="l-grad">gradient</span><div class="chips" data-group="gradient" role="group" aria-labelledby="l-grad"></div></div>
+        <div class="field" data-show="glitter"><span class="lbl" id="l-bgfill">glitter</span><div class="chips" data-group="bgFill" role="group" aria-labelledby="l-bgfill"></div></div>
+        <div class="field" data-show="photo">
+          <div class="btnrow">
+            <button type="button" class="btn small alt" id="pickPhoto">📷 pick a photo</button>
+            <button type="button" class="btn small ghost" id="matchPhoto" disabled>match photo shape</button>
+          </div>
+          <input type="file" id="photoIn" accept="image/*" hidden>
+        </div>
+        <div class="field" data-show="photo"><span class="lbl" id="l-fit">photo fit</span><div class="chips" data-group="fit" role="group" aria-labelledby="l-fit"></div></div>
+        <div class="field"><label for="border">border</label><select id="border" data-k="border"></select></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>✧ size + speed ✧</legend>
+        <div class="row3">
+          <div class="field"><label for="preset">size</label><select id="preset"></select></div>
+          <div class="field"><label for="w">width</label><input type="number" id="w" data-k="w" min="16" max="640"></div>
+          <div class="field"><label for="h">height</label><input type="number" id="h" data-k="h" min="16" max="640"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="frames">frames <output id="o-frames"></output></label><input type="range" id="frames" data-k="frames" min="4" max="24" step="1"></div>
+          <div class="field"><label for="delay">frame delay <output id="o-delay"></output></label><input type="range" id="delay" data-k="delay" min="30" max="300" step="10"></div>
+        </div>
+      </fieldset>
+    </section>
+  </div>
+</main>
+<footer class="foot">
+  ✦ everything gets made right here in ur browser, nothing is uploaded ✦<br>
+  you are visitor <span class="counter">004213</span> · best viewed at 800×600
+</footer>
+
+<script>
+(() => {
+'use strict';
+
+const TAU = Math.PI * 2;
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const hex = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
+const rgb = c => `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`;
+const pick = a => a[Math.random() * a.length | 0];
+
+function mulberry32(a) {
+  return () => {
+    a = a + 0x6d2b79f5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function hsl(h, s, l) {
+  const a = s * Math.min(l, 1 - l);
+  const f = n => {
+    const k = (n + h * 12) % 12;
+    return 255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)));
+  };
+  return [f(0), f(8), f(4)];
+}
+
+const FONTS = [
+  ['Pacifico', 16], ['Great Vibes', 19], ['Lobster', 16], ['Chewy', 16], ['Rubik Bubbles', 15], ['Bungee', 13],
+  ['Audiowide', 14], ['Monoton', 15], ['Press Start 2P', 9], ['Silkscreen', 13], ['Comic Sans MS', 14], ['Impact', 15],
+];
+
+const FILLS = {
+  pink:    { label: 'pink',    kind: 'glitter', dark: '#a8005a', light: '#ffc8e7' },
+  purple:  { label: 'purple',  kind: 'glitter', dark: '#4a0fa8', light: '#ddc4ff' },
+  blue:    { label: 'blue',    kind: 'glitter', dark: '#0a3aa0', light: '#c2e4ff' },
+  aqua:    { label: 'aqua',    kind: 'glitter', dark: '#006c78', light: '#b8fff3' },
+  lime:    { label: 'lime',    kind: 'glitter', dark: '#3a7600', light: '#e6ffa3' },
+  gold:    { label: 'gold',    kind: 'glitter', dark: '#865200', light: '#fff1a6' },
+  silver:  { label: 'silver',  kind: 'glitter', dark: '#565e6b', light: '#f5f8fc' },
+  red:     { label: 'red',     kind: 'glitter', dark: '#8a0016', light: '#ffb3bb' },
+  black:   { label: 'black',   kind: 'glitter', dark: '#040406', light: '#5e5e6c' },
+  rainbow: { label: 'rainbow', kind: 'rainbow', dark: '#7a0aa8', light: '#ffd1f7' },
+  chrome:  { label: 'chrome',  kind: 'chrome',  dark: '#4a5361', light: '#f4f7fb' },
+  holo:    { label: 'holo',    kind: 'holo',    dark: '#8a6cff', light: '#ffe1fb' },
+};
+for (const f of Object.values(FILLS)) { f.d = hex(f.dark); f.l = hex(f.light); }
+
+const GRADIENTS = {
+  bubblegum: ['#ffd1ec', '#ffa8d9', '#cdb6ff'],
+  cyber: ['#00e1ff', '#7a5cff', '#ff3dcf'],
+  sunset: ['#ffe29f', '#ff9a8b', '#ff6a9f'],
+  lagoon: ['#a8ffec', '#8ec5ff', '#b7a3ff'],
+  slime: ['#f6ffb8', '#b8ff7a', '#5ee3c3'],
+  silver: ['#ffffff', '#c9ced6', '#f1f3f7'],
+};
+
+const SIZES = [
+  { id: 'banner', label: 'banner · 400×200', w: 400, h: 200 },
+  { id: 'square', label: 'square · 300×300', w: 300, h: 300 },
+  { id: 'icon', label: 'icon · 100×100', w: 100, h: 100 },
+  { id: 'web', label: 'web banner · 468×60', w: 468, h: 60 },
+  { id: 'button', label: 'button · 88×31', w: 88, h: 31 },
+  { id: 'blinkie', label: 'blinkie · 150×20', w: 150, h: 20 },
+  { id: 'custom', label: 'custom' },
+];
+
+const SHAPES = ['twinkle', 'burst', 'star', 'heart', 'pixel'];
+
+const S = {
+  text: 'xoxo', font: 'Pacifico', fill: 'pink', scale: 90, grain: 2, outline: 4, outlineColor: '#ffffff', effect: 'glow',
+  shape: 'twinkle', sColor: 'white', amount: 18, sSize: 30, where: 'all',
+  bg: 'stars', bgColor: '#ffe1f2', gradient: 'bubblegum', bgFill: 'purple', fit: 'cover', border: 'none',
+  w: 400, h: 200, frames: 12, delay: 90, seed: 20021,
+};
+
+let photo = null, photoId = 0, fontsVersion = 0, stuck = [];
+
+const memo = new Map();
+function cached(name, deps, build) {
+  const key = JSON.stringify(deps);
+  const hit = memo.get(name);
+  if (hit && hit.key === key) return hit.value;
+  const value = build();
+  memo.set(name, { key, value });
+  return value;
+}
+
+function blank() {
+  const c = document.createElement('canvas');
+  c.width = S.w; c.height = S.h;
+  return c;
+}
+
+const pool = {};
+function scratch(name) {
+  const c = pool[name] || (pool[name] = document.createElement('canvas'));
+  if (c.width !== S.w || c.height !== S.h) { c.width = S.w; c.height = S.h; c._img = null; }
+  return c;
+}
+const imageData = c => c._img || (c._img = c.getContext('2d').createImageData(c.width, c.height));
+const fullBox = () => ({ x0: 0, y0: 0, x1: S.w, y1: S.h });
+
+function cells(name, seed) {
+  return cached('cells:' + name, [S.w, S.h, S.grain, seed], () => {
+    const rnd = mulberry32(seed);
+    const g = S.grain, cw = Math.ceil(S.w / g), ch = Math.ceil(S.h / g), n = cw * ch;
+    const phase = new Float32Array(n), speed = new Uint8Array(n), base = new Float32Array(n), flash = new Uint8Array(n);
+    for (let i = 0; i < n; i++) {
+      phase[i] = rnd();
+      speed[i] = 1 + (rnd() * 3 | 0);
+      base[i] = rnd();
+      flash[i] = rnd() < 0.07 ? 1 : 0;
+    }
+    return { g, cw, ch, phase, speed, base, flash };
+  });
+}
+
+function paintGlitter(img, c, f, t) {
+  const d = img.data, W = img.width, H = img.height, { g, cw, ch } = c;
+  const [dr, dg, db] = f.d, [lr, lg, lb] = f.l;
+  const rainbow = f.kind === 'rainbow';
+  for (let cy = 0; cy < ch; cy++) {
+    for (let cx = 0; cx < cw; cx++) {
+      const i = cy * cw + cx;
+      const s = Math.sin(TAU * (c.speed[i] * t + c.phase[i]));
+      const tw = 0.5 + 0.5 * s;
+      const v = 0.3 * c.base[i] + 0.7 * tw * tw;
+      let r, gg, b;
+      if ((c.flash[i] && s > 0.55) || v > 0.93) {
+        r = gg = b = 255;
+      } else if (rainbow) {
+        [r, gg, b] = hsl((cx / cw * 0.85 + cy / ch * 0.15 + t) % 1, 1, 0.28 + 0.55 * v);
+      } else {
+        r = dr + (lr - dr) * v; gg = dg + (lg - dg) * v; b = db + (lb - db) * v;
+      }
+      const x0 = cx * g, y0 = cy * g, x1 = Math.min(W, x0 + g), y1 = Math.min(H, y0 + g);
+      for (let y = y0; y < y1; y++) {
+        for (let x = x0, p = (y * W + x0) * 4; x < x1; x++, p += 4) {
+          d[p] = r; d[p + 1] = gg; d[p + 2] = b; d[p + 3] = 255;
+        }
+      }
+    }
+  }
+}
+
+function shine(ctx, t, box) {
+  const p = t / 0.6;
+  if (p >= 1) return;
+  const bw = Math.max(5, (box.x1 - box.x0) * 0.1), cy = (box.y0 + box.y1) / 2;
+  const cx = box.x0 - bw * 2 + p * (box.x1 - box.x0 + bw * 4);
+  const g = ctx.createLinearGradient(cx - bw, cy + bw * 0.7, cx + bw, cy - bw * 0.7);
+  g.addColorStop(0, 'rgba(255,255,255,0)');
+  g.addColorStop(0.5, 'rgba(255,255,255,0.95)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+
+function paintFill(cv, key, cellSet, t, box) {
+  const ctx = cv.getContext('2d'), f = FILLS[key];
+  ctx.globalCompositeOperation = 'source-over';
+  if (f.kind === 'glitter' || f.kind === 'rainbow') {
+    const img = imageData(cv);
+    paintGlitter(img, cellSet, f, t);
+    ctx.putImageData(img, 0, 0);
+    return;
+  }
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  let g;
+  if (f.kind === 'chrome') {
+    g = ctx.createLinearGradient(0, box.y0, 0, box.y1);
+    [[0, '#ffffff'], [0.42, '#dfe4ec'], [0.5, '#56606f'], [0.56, '#9ba6b6'], [0.8, '#f1f4f8'], [1, '#aeb6c2']]
+      .forEach(([o, c]) => g.addColorStop(o, c));
+  } else {
+    g = ctx.createLinearGradient(box.x0, box.y0, box.x1, box.y1);
+    for (let i = 0; i <= 6; i++) g.addColorStop(i / 6, rgb(hsl((i / 6 + t) % 1, 1, 0.82)));
+  }
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, cv.width, cv.height);
+  shine(ctx, t, box);
+}
+
+const measure = document.createElement('canvas').getContext('2d');
+const fontCss = name => `"${name}", Verdana, sans-serif`;
+const EFFECT_PAD = { none: 0, shadow: 0.06, '3d': 0.08, glow: 0.12 };
+const PIXEL_FONTS = { 'Silkscreen': 8, 'Press Start 2P': 8 };
+const depth = fs => Math.max(2, Math.round(fs * 0.07));
+const shadowOff = fs => Math.max(1, Math.round(fs * 0.05));
+
+function layout() {
+  return cached('layout', [S.text, S.font, S.scale, S.w, S.h, S.outline, S.effect, fontsVersion], () => {
+    const lines = S.text.replace(/\r/g, '').split('\n');
+    if (!lines.some(l => l.trim())) return null;
+    measure.font = `100px ${fontCss(S.font)}`;
+    const m = lines.map(l => measure.measureText(l));
+    const LH = 118;
+    const asc = m[0].actualBoundingBoxAscent, desc = m[m.length - 1].actualBoundingBoxDescent;
+    const blockH = (lines.length - 1) * LH + asc + desc;
+    const blockW = Math.max(1, ...m.map(x => x.actualBoundingBoxLeft + x.actualBoundingBoxRight));
+    const ex = EFFECT_PAD[S.effect];
+    const availW = S.w * 0.92 - S.outline * 2, availH = S.h * 0.86 - S.outline * 2;
+    const fit = Math.min(availW / (blockW / 100 + ex), availH / (blockH / 100 + ex)) * S.scale / 100;
+    const grid = PIXEL_FONTS[S.font];
+    const fs = grid && fit >= grid ? Math.floor(fit / grid) * grid : Math.max(4, Math.round(fit));
+    const k = fs / 100;
+    const shift = S.effect === '3d' ? depth(fs) / 2 : S.effect === 'shadow' ? shadowOff(fs) / 2 : 0;
+    const top = S.h / 2 - blockH * k / 2 - shift;
+    const b0 = top + asc * k;
+    const pos = m.map((x, i) => ({
+      x: Math.round(S.w / 2 - (x.actualBoundingBoxRight - x.actualBoundingBoxLeft) * k / 2 - shift),
+      y: Math.round(b0 + i * LH * k),
+    }));
+    const box = { x0: S.w / 2 - blockW * k / 2 - shift, x1: S.w / 2 + blockW * k / 2 - shift, y0: top, y1: top + blockH * k };
+    return { lines, font: `${fs}px ${fontCss(S.font)}`, fs, pos, box };
+  });
+}
+
+const layoutDeps = L => [L.font, L.pos, L.lines, S.w, S.h];
+
+function textMask(L) {
+  return cached('mask', layoutDeps(L), () => {
+    const c = blank(), x = c.getContext('2d');
+    x.font = L.font;
+    x.fillStyle = '#000';
+    L.lines.forEach((l, i) => x.fillText(l, L.pos[i].x, L.pos[i].y));
+    return c;
+  });
+}
+
+function silhouette(L, color) {
+  return cached('sil:' + color, [...layoutDeps(L), S.outline], () => {
+    const c = blank(), x = c.getContext('2d');
+    x.font = L.font;
+    x.lineJoin = 'round';
+    x.lineWidth = S.outline * 2;
+    x.fillStyle = x.strokeStyle = color;
+    L.lines.forEach((l, i) => {
+      if (S.outline) x.strokeText(l, L.pos[i].x, L.pos[i].y);
+      x.fillText(l, L.pos[i].x, L.pos[i].y);
+    });
+    return c;
+  });
+}
+
+function maskPoints(L) {
+  return cached('pts', layoutDeps(L), () => {
+    const d = textMask(L).getContext('2d').getImageData(0, 0, S.w, S.h).data;
+    const step = Math.max(1, Math.round(Math.min(S.w, S.h) / 100));
+    const pts = [];
+    for (let y = 0; y < S.h; y += step) {
+      for (let x = 0; x < S.w; x += step) if (d[(y * S.w + x) * 4 + 3] > 128) pts.push([x, y]);
+    }
+    return pts;
+  });
+}
+
+function drawText(ctx, t) {
+  const L = layout();
+  if (!L) return;
+  const f = FILLS[S.fill];
+  if (S.effect === '3d') {
+    const sil = silhouette(L, rgb(f.d.map(v => v * 0.5)));
+    for (let k = depth(L.fs); k >= 1; k--) ctx.drawImage(sil, k, k);
+  } else if (S.effect === 'shadow') {
+    const o = shadowOff(L.fs);
+    ctx.globalAlpha = 0.5;
+    ctx.drawImage(silhouette(L, '#2a0a45'), o, o);
+    ctx.globalAlpha = 1;
+  } else if (S.effect === 'glow') {
+    const gc = rgb(f.kind === 'glitter' ? f.l : [255, 150, 215]);
+    const sil = silhouette(L, gc);
+    ctx.shadowColor = gc;
+    ctx.shadowBlur = Math.max(3, L.fs * 0.2);
+    ctx.drawImage(sil, 0, 0);
+    ctx.drawImage(sil, 0, 0);
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'rgba(0,0,0,0)';
+  }
+  if (S.outline) ctx.drawImage(silhouette(L, S.outlineColor), 0, 0);
+  const c = scratch('text');
+  paintFill(c, S.fill, cells('text', S.seed * 7919 + 1), t, L.box);
+  const x = c.getContext('2d');
+  x.globalCompositeOperation = 'destination-in';
+  x.drawImage(textMask(L), 0, 0);
+  x.globalCompositeOperation = 'source-over';
+  ctx.drawImage(c, 0, 0);
+}
+
+function drawStars(ctx, t) {
+  const g = ctx.createLinearGradient(0, 0, 0, S.h);
+  g.addColorStop(0, '#0d0630');
+  g.addColorStop(1, '#3a0d68');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, S.w, S.h);
+  const stars = cached('stars', [S.w, S.h, S.seed], () => {
+    const rnd = mulberry32(S.seed * 17 + 3);
+    return Array.from({ length: Math.round(S.w * S.h / 260) }, () => ({
+      x: rnd() * S.w | 0, y: rnd() * S.h | 0, p: rnd(), sp: 1 + (rnd() * 2 | 0), big: rnd() < 0.08,
+      c: ['255,190,235', '190,225,255', '255,255,255'][rnd() * 3 | 0],
+    }));
+  });
+  for (const st of stars) {
+    const v = 0.5 + 0.5 * Math.sin(TAU * (st.sp * t + st.p));
+    ctx.fillStyle = `rgba(${st.c},${(0.2 + 0.8 * v).toFixed(2)})`;
+    ctx.fillRect(st.x, st.y, 1, 1);
+    if (st.big && v > 0.6) {
+      ctx.fillRect(st.x - 1, st.y, 3, 1);
+      ctx.fillRect(st.x, st.y - 1, 1, 3);
+    }
+  }
+}
+
+function drawPhoto(ctx) {
+  const iw = photo.naturalWidth, ih = photo.naturalHeight;
+  const sc = S.fit === 'cover' ? Math.max(S.w / iw, S.h / ih) : Math.min(S.w / iw, S.h / ih);
+  const dw = iw * sc, dh = ih * sc;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(photo, (S.w - dw) / 2, (S.h - dh) / 2, dw, dh);
+}
+
+function drawBackground(ctx, t) {
+  switch (S.bg) {
+    case 'color':
+      ctx.fillStyle = S.bgColor;
+      ctx.fillRect(0, 0, S.w, S.h);
+      break;
+    case 'gradient': {
+      const stops = GRADIENTS[S.gradient], g = ctx.createLinearGradient(0, 0, S.w, S.h);
+      stops.forEach((c, i) => g.addColorStop(i / (stops.length - 1), c));
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, S.w, S.h);
+      break;
+    }
+    case 'glitter': {
+      const c = scratch('bg');
+      paintFill(c, S.bgFill, cells('bg', S.seed * 7919 + 2), t, fullBox());
+      ctx.drawImage(c, 0, 0);
+      break;
+    }
+    case 'stars':
+      drawStars(ctx, t);
+      break;
+    case 'photo':
+      ctx.fillStyle = S.bgColor;
+      ctx.fillRect(0, 0, S.w, S.h);
+      if (photo) drawPhoto(ctx);
+      break;
+  }
+}
+
+function borderMask() {
+  return cached('ring', [S.w, S.h], () => {
+    const c = blank(), x = c.getContext('2d');
+    const bw = Math.max(2, Math.round(Math.min(S.w, S.h) * 0.045));
+    x.beginPath();
+    x.rect(0, 0, S.w, S.h);
+    x.rect(bw, bw, S.w - 2 * bw, S.h - 2 * bw);
+    x.fill('evenodd');
+    return c;
+  });
+}
+
+function drawBorder(ctx, t) {
+  if (S.border === 'none') return;
+  const c = scratch('border');
+  paintFill(c, S.border, cells('border', S.seed * 7919 + 3), t, fullBox());
+  const x = c.getContext('2d');
+  x.globalCompositeOperation = 'destination-in';
+  x.drawImage(borderMask(), 0, 0);
+  x.globalCompositeOperation = 'source-over';
+  ctx.drawImage(c, 0, 0);
+}
+
+function makeSparkle(x, y, rnd, phase) {
+  return {
+    x, y, phase, sz: 0.6 + rnd() * 0.8, mixType: SHAPES[rnd() * SHAPES.length | 0],
+    rot: (rnd() - 0.5) * 0.4, dir: rnd() < 0.5 ? -1 : 1, hue: rnd(),
+  };
+}
+
+function sparkles() {
+  const onText = S.where === 'text' ? layout() : null;
+  const deps = [S.seed, S.amount, S.sSize, S.w, S.h, S.where, onText && layoutDeps(onText)];
+  return cached('sparkles', deps, () => {
+    const pts = onText ? maskPoints(onText) : null;
+    const rnd = mulberry32(S.seed * 31 + 5);
+    const out = [];
+    for (let i = 0; i < S.amount; i++) {
+      let x, y;
+      if (pts && pts.length) {
+        [x, y] = pts[rnd() * pts.length | 0];
+      } else {
+        const pad = Math.min(S.sSize * 0.35, Math.min(S.w, S.h) * 0.2);
+        x = pad + rnd() * (S.w - 2 * pad);
+        y = pad + rnd() * (S.h - 2 * pad);
+      }
+      out.push(makeSparkle(x, y, rnd, (i / S.amount + rnd() * 0.2) % 1));
+    }
+    return out;
+  });
+}
+
+function sparkleLook(s) {
+  const f = FILLS[S.fill];
+  switch (S.sColor) {
+    case 'match': return [rgb(f.l), rgb(f.d)];
+    case 'rainbow': return [rgb(hsl(s.hue, 1, 0.8)), rgb(hsl(s.hue, 1, 0.6))];
+    case 'gold': return ['#fff6b8', '#ffb300'];
+    case 'pink': return ['#ffe0f1', '#ff2d95'];
+    default: return ['#ffffff', rgb(f.l)];
+  }
+}
+
+function twinklePath(ctx, r) {
+  const c = r * 0.14;
+  ctx.moveTo(0, -r);
+  ctx.quadraticCurveTo(c, -c, r, 0);
+  ctx.quadraticCurveTo(c, c, 0, r);
+  ctx.quadraticCurveTo(-c, c, -r, 0);
+  ctx.quadraticCurveTo(-c, -c, 0, -r);
+  ctx.closePath();
+}
+
+function starPath(ctx, radii, n) {
+  for (let j = 0; j < n; j++) {
+    const a = j / n * TAU - Math.PI / 2, rad = radii[j % radii.length];
+    ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+  }
+  ctx.closePath();
+}
+
+function heartPath(ctx, r) {
+  const k = r * 0.9;
+  ctx.moveTo(0, 0.75 * k);
+  ctx.bezierCurveTo(-0.1 * k, 0.6 * k, -k, 0.1 * k, -k, -0.35 * k);
+  ctx.bezierCurveTo(-k, -0.85 * k, -0.3 * k, -k, 0, -0.5 * k);
+  ctx.bezierCurveTo(0.3 * k, -k, k, -0.85 * k, k, -0.35 * k);
+  ctx.bezierCurveTo(k, 0.1 * k, 0.1 * k, 0.6 * k, 0, 0.75 * k);
+  ctx.closePath();
+}
+
+function pixelSparkle(ctx, s, k, size, core, glow) {
+  const u = Math.max(1, Math.round(size / 9));
+  const arm = Math.round(k * 3);
+  const ox = Math.round(s.x - u / 2), oy = Math.round(s.y - u / 2);
+  const block = (dx, dy) => ctx.fillRect(ox + dx * u, oy + dy * u, u, u);
+  ctx.fillStyle = glow;
+  for (let i = 2; i <= arm; i++) { block(i, 0); block(-i, 0); block(0, i); block(0, -i); }
+  if (arm >= 3) { block(1, 1); block(-1, 1); block(1, -1); block(-1, -1); }
+  ctx.fillStyle = core;
+  block(0, 0);
+  if (arm >= 1) { block(1, 0); block(-1, 0); block(0, 1); block(0, -1); }
+}
+
+function drawSparkle(ctx, s, t) {
+  const k = Math.sin(TAU * (t + s.phase));
+  if (k <= 0.02) return;
+  const type = S.shape === 'mix' ? s.mixType : S.shape;
+  const size = S.sSize * s.sz;
+  const [core, glow] = sparkleLook(s);
+  if (type === 'pixel') { pixelSparkle(ctx, s, k, size, core, glow); return; }
+  const r = size / 2 * Math.pow(k, 0.75);
+  ctx.save();
+  ctx.translate(s.x, s.y);
+  if (type !== 'heart') ctx.rotate(s.rot + s.dir * t * TAU / (type === 'star' ? 5 : 4));
+  ctx.fillStyle = core;
+  ctx.shadowColor = glow;
+  ctx.shadowBlur = Math.max(2, r * 0.8);
+  ctx.beginPath();
+  if (type === 'twinkle') twinklePath(ctx, r);
+  else if (type === 'burst') starPath(ctx, [r, r * 0.12, r * 0.5, r * 0.12], 16);
+  else if (type === 'star') starPath(ctx, [r, r * 0.45], 10);
+  else heartPath(ctx, r);
+  ctx.fill();
+  if (type === 'twinkle' || type === 'burst') {
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(0, 0, Math.max(0.6, r * 0.14), 0, TAU);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function render(ctx, t) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = 'rgba(0,0,0,0)';
+  ctx.clearRect(0, 0, S.w, S.h);
+  drawBackground(ctx, t);
+  drawText(ctx, t);
+  drawBorder(ctx, t);
+  for (const s of sparkles()) drawSparkle(ctx, s, t);
+  for (const s of stuck) drawSparkle(ctx, s, t);
+}
+
+class Bytes {
+  constructor() { this.a = new Uint8Array(1 << 16); this.n = 0; }
+  grow(k) {
+    if (this.n + k <= this.a.length) return;
+    const b = new Uint8Array(Math.max(this.a.length * 2, this.n + k));
+    b.set(this.a);
+    this.a = b;
+  }
+  byte(v) { this.grow(1); this.a[this.n++] = v; }
+  u16(v) { this.byte(v & 255); this.byte(v >> 8 & 255); }
+  str(s) { for (const ch of s) this.byte(ch.charCodeAt(0)); }
+  bytes(src, from, len) { this.grow(len); this.a.set(src.subarray(from, from + len), this.n); this.n += len; }
+  result() { return this.a.slice(0, this.n); }
+}
+
+function lzw(idx, table, genRef) {
+  const out = new Bytes();
+  let gen = ++genRef.gen, size = 9, next = 258, acc = 0, bits = 0;
+  const put = code => {
+    acc |= code << bits;
+    bits += size;
+    while (bits >= 8) { out.byte(acc & 255); acc >>>= 8; bits -= 8; }
+  };
+  put(256);
+  let prefix = idx[0];
+  for (let i = 1; i < idx.length; i++) {
+    const k = idx[i], key = prefix << 8 | k, e = table[key];
+    if (e >>> 12 === gen) { prefix = e & 4095; continue; }
+    put(prefix);
+    if (next === 4096) {
+      put(256);
+      gen = ++genRef.gen;
+      size = 9;
+      next = 258;
+    } else {
+      if (next >= 1 << size) size++;
+      table[key] = gen << 12 | next++;
+    }
+    prefix = k;
+  }
+  put(prefix);
+  put(257);
+  if (bits) out.byte(acc & 255);
+  return out.result();
+}
+
+function medianCut(cnt, sr, sg, sb, max) {
+  const bins = [];
+  for (let k = 0; k < cnt.length; k++) {
+    if (cnt[k]) bins.push({ n: cnt[k], r: sr[k] / cnt[k], g: sg[k] / cnt[k], b: sb[k] / cnt[k] });
+  }
+  if (!bins.length) return [[0, 0, 0]];
+  const box = list => {
+    let n = 0, r0 = 255, r1 = 0, g0 = 255, g1 = 0, b0 = 255, b1 = 0;
+    for (const c of list) {
+      n += c.n;
+      if (c.r < r0) r0 = c.r; if (c.r > r1) r1 = c.r;
+      if (c.g < g0) g0 = c.g; if (c.g > g1) g1 = c.g;
+      if (c.b < b0) b0 = c.b; if (c.b > b1) b1 = c.b;
+    }
+    const rr = r1 - r0, gr = g1 - g0, br = b1 - b0;
+    return { list, n, range: Math.max(rr, gr, br), ch: rr >= gr && rr >= br ? 'r' : gr >= br ? 'g' : 'b' };
+  };
+  const boxes = [box(bins)];
+  while (boxes.length < max) {
+    let bi = -1, best = 0;
+    for (let i = 0; i < boxes.length; i++) {
+      const b = boxes[i];
+      if (b.list.length < 2) continue;
+      const score = b.range * Math.sqrt(b.n);
+      if (score > best) { best = score; bi = i; }
+    }
+    if (bi < 0) break;
+    const { list, n, ch } = boxes[bi];
+    list.sort((a, b) => a[ch] - b[ch]);
+    let acc = 0, cut = list.length - 1;
+    for (let i = 0; i < list.length - 1; i++) {
+      acc += list[i].n;
+      if (acc >= n / 2) { cut = i + 1; break; }
+    }
+    boxes.splice(bi, 1, box(list.slice(0, cut)), box(list.slice(cut)));
+  }
+  return boxes.map(b => {
+    let n = 0, r = 0, g = 0, bl = 0;
+    for (const c of b.list) { n += c.n; r += c.r * c.n; g += c.g * c.n; bl += c.b * c.n; }
+    return [Math.round(r / n), Math.round(g / n), Math.round(bl / n)];
+  });
+}
+
+const DISPOSE_KEEP = 1, DISPOSE_RESTORE_BACKGROUND = 2;
+
+function encodeGif(frames, w, h, delayCs) {
+  const N = 32768;
+  const cnt = new Float64Array(N), sr = new Float64Array(N), sg = new Float64Array(N), sb = new Float64Array(N);
+  const keyOf = (d, p) => (d[p] >> 3) << 10 | (d[p + 1] >> 3) << 5 | d[p + 2] >> 3;
+  let transparent = false;
+  for (const d of frames) {
+    for (let p = 0; p < d.length; p += 4) {
+      if (d[p + 3] < 128) { transparent = true; continue; }
+      const k = keyOf(d, p);
+      cnt[k]++; sr[k] += d[p]; sg[k] += d[p + 1]; sb[k] += d[p + 2];
+    }
+  }
+  const palette = medianCut(cnt, sr, sg, sb, transparent ? 255 : 256);
+  const tIndex = transparent ? palette.length : 0;
+  const lut = new Int16Array(N).fill(-1);
+  const nearest = k => {
+    const r = sr[k] / cnt[k], g = sg[k] / cnt[k], b = sb[k] / cnt[k];
+    let best = 0, bd = Infinity;
+    for (let i = 0; i < palette.length; i++) {
+      const c = palette[i], dr = r - c[0], dg = g - c[1], db = b - c[2];
+      const dd = 3 * dr * dr + 4 * dg * dg + 2 * db * db;
+      if (dd < bd) { bd = dd; best = i; }
+    }
+    return best;
+  };
+
+  const out = new Bytes();
+  out.str('GIF89a');
+  out.u16(w); out.u16(h);
+  out.byte(0xf7); out.byte(tIndex); out.byte(0);
+  for (let i = 0; i < 256; i++) {
+    const c = palette[i] || [0, 0, 0];
+    out.byte(c[0]); out.byte(c[1]); out.byte(c[2]);
+  }
+  out.byte(0x21); out.byte(0xff); out.byte(11); out.str('NETSCAPE2.0');
+  out.byte(3); out.byte(1); out.u16(0); out.byte(0);
+
+  const idx = new Uint8Array(w * h), table = new Int32Array(1 << 20), genRef = { gen: 0 };
+  for (const d of frames) {
+    for (let p = 0, i = 0; i < idx.length; p += 4, i++) {
+      if (d[p + 3] < 128) { idx[i] = tIndex; continue; }
+      const k = keyOf(d, p);
+      let v = lut[k];
+      if (v < 0) v = lut[k] = nearest(k);
+      idx[i] = v;
+    }
+    out.byte(0x21); out.byte(0xf9); out.byte(4);
+    out.byte(transparent ? DISPOSE_RESTORE_BACKGROUND << 2 | 1 : DISPOSE_KEEP << 2);
+    out.u16(delayCs); out.byte(tIndex); out.byte(0);
+    out.byte(0x2c); out.u16(0); out.u16(0); out.u16(w); out.u16(h); out.byte(0);
+    out.byte(8);
+    const data = lzw(idx, table, genRef);
+    for (let i = 0; i < data.length; i += 255) {
+      const n = Math.min(255, data.length - i);
+      out.byte(n);
+      out.bytes(data, i, n);
+    }
+    out.byte(0);
+  }
+  out.byte(0x3b);
+  return out.result();
+}
+
+const view = $('#preview'), vctx = view.getContext('2d'), wrap = $('#wrap');
+let fi = 0, lastT = 0, paused = false, curW = S.w, curH = S.h, outUrl = null;
+const delayCs = () => Math.max(2, Math.round(S.delay / 10));
+const draw = () => render(vctx, (fi % S.frames) / S.frames);
+
+function loop(now) {
+  if (!paused && now - lastT >= delayCs() * 10) {
+    lastT = now;
+    fi = (fi + 1) % S.frames;
+    draw();
+  }
+  requestAnimationFrame(loop);
+}
+
+function syncSize() {
+  if (curW !== S.w || curH !== S.h) {
+    for (const s of stuck) { s.x *= S.w / curW; s.y *= S.h / curH; }
+    curW = S.w; curH = S.h;
+  }
+  if (view.width !== S.w || view.height !== S.h) { view.width = S.w; view.height = S.h; }
+  const room = wrap.clientWidth - 30;
+  let sc = Math.min(room / S.w, 420 / S.h);
+  sc = sc >= 2 ? Math.floor(sc) : Math.min(1, sc);
+  view.style.width = S.w * sc + 'px';
+  view.style.height = S.h * sc + 'px';
+  view.classList.toggle('px', sc >= 2);
+}
+
+const FMT = {
+  scale: v => v + '%', grain: v => v + 'px', outline: v => v ? v + 'px' : 'off',
+  amount: v => v, sSize: v => v + 'px', frames: v => v, delay: v => v + 'ms',
+};
+function updateOutputs() {
+  for (const k in FMT) { const o = $('#o-' + k); if (o) o.textContent = FMT[k](S[k]); }
+  const u = $('#unstick');
+  u.disabled = !stuck.length;
+  u.textContent = stuck.length ? `unstick all (${stuck.length})` : 'unstick all';
+  $('#matchPhoto').disabled = !photo;
+}
+
+function showRows() {
+  $$('[data-show]').forEach(el => { el.hidden = !el.dataset.show.split(' ').includes(S.bg); });
+}
+
+function matchPreset() {
+  const p = SIZES.find(s => s.w === S.w && s.h === S.h);
+  return p ? p.id : 'custom';
+}
+
+function markChips(group) {
+  $$(`[data-group="${group}"] .chip`).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === String(S[group]))));
+}
+
+function syncControls() {
+  $$('[data-k]').forEach(el => { el.value = S[el.dataset.k]; });
+  $$('[data-group]').forEach(el => markChips(el.dataset.group));
+  $('#preset').value = matchPreset();
+  showRows();
+  updateOutputs();
+}
+
+function loadFont(name) {
+  document.fonts.load(`100px "${name}"`).then(() => { fontsVersion++; draw(); }, () => {});
+}
+
+function onChange(k) {
+  if (k === 'font') loadFont(S.font);
+  if (k === 'bg') showRows();
+  if (k === 'w' || k === 'h') $('#preset').value = matchPreset();
+  updateOutputs();
+  syncSize();
+  draw();
+}
+
+function set(k, v) {
+  S[k] = v;
+  const el = $(`[data-k="${k}"]`);
+  if (el) el.value = v;
+}
+
+function autoTune() {
+  const m = Math.min(S.w, S.h);
+  set('outline', clamp(Math.round(m / 50), 1, 5));
+  set('sSize', clamp(Math.round(m * 0.16), 6, 48));
+  set('grain', m < 80 ? 1 : 2);
+  set('amount', clamp(Math.round(S.w * S.h / 4000), 4, 26));
+}
+
+function swatchCss(f) {
+  if (f.kind === 'rainbow') return 'conic-gradient(from 30deg,#ff5fa8,#ffd25f,#8dff7a,#5fd6ff,#a77bff,#ff5fa8)';
+  if (f.kind === 'chrome') return 'linear-gradient(#fff,#dfe4ec 42%,#56606f 50%,#9ba6b6 56%,#f1f4f8 80%,#aeb6c2)';
+  if (f.kind === 'holo') return 'linear-gradient(135deg,#ffc9f1,#c9e9ff,#d4ffd6,#fff1c4,#e2ccff)';
+  return `radial-gradient(circle at 28% 30%,#fff 0 9%,transparent 11%),radial-gradient(circle at 70% 64%,${f.light} 0 10%,transparent 12%),linear-gradient(135deg,${f.dark},${f.light} 55%,${f.dark})`;
+}
+
+function chips(group, items) {
+  const box = $(`[data-group="${group}"]`);
+  for (const it of items) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip';
+    b.dataset.v = it.v;
+    if (it.swatch) {
+      const sw = document.createElement('i');
+      sw.className = 'sw';
+      sw.style.background = it.swatch;
+      b.append(sw);
+    }
+    b.append(it.label);
+    if (it.style) b.style.cssText = it.style;
+    b.addEventListener('click', () => { S[group] = it.v; markChips(group); onChange(group); });
+    box.append(b);
+  }
+}
+
+const fillItems = Object.entries(FILLS).map(([v, f]) => ({ v, label: f.label, swatch: swatchCss(f) }));
+chips('font', FONTS.map(([v, px]) => ({ v, label: v, style: `font-family:${fontCss(v).replace(/"/g, "'")};font-size:${px}px` })));
+chips('fill', fillItems);
+chips('effect', [['none', 'none'], ['shadow', 'shadow'], ['3d', '3D'], ['glow', 'glow']].map(([v, label]) => ({ v, label })));
+chips('shape', [['twinkle', '✦ twinkle'], ['burst', '✷ burst'], ['star', '★ star'], ['heart', '♥ heart'], ['pixel', '✚ pixel'], ['mix', '✺ mix']].map(([v, label]) => ({ v, label })));
+chips('sColor', [['white', 'white'], ['match', 'match fill'], ['rainbow', 'rainbow'], ['gold', 'gold'], ['pink', 'hot pink']].map(([v, label]) => ({ v, label })));
+chips('where', [['all', 'all over'], ['text', 'on the text']].map(([v, label]) => ({ v, label })));
+chips('bg', [['transparent', 'see-through'], ['color', 'color'], ['gradient', 'gradient'], ['glitter', 'glitter'], ['stars', 'starry night'], ['photo', 'photo']].map(([v, label]) => ({ v, label })));
+chips('gradient', Object.entries(GRADIENTS).map(([v, st]) => ({ v, label: v, swatch: `linear-gradient(135deg,${st.join(',')})` })));
+chips('bgFill', fillItems);
+chips('fit', [['cover', 'fill'], ['contain', 'fit whole']].map(([v, label]) => ({ v, label })));
+
+const borderSel = $('#border');
+borderSel.append(new Option('none', 'none'));
+for (const [v, f] of Object.entries(FILLS)) borderSel.append(new Option(f.kind === 'glitter' ? `${f.label} glitter` : f.label, v));
+
+const presetSel = $('#preset');
+for (const s of SIZES) presetSel.append(new Option(s.label, s.id));
+presetSel.addEventListener('change', () => {
+  const p = SIZES.find(s => s.id === presetSel.value);
+  if (!p || !p.w) return;
+  S.w = p.w; S.h = p.h;
+  autoTune();
+  syncControls();
+  onChange('size');
+});
+
+$$('[data-k]').forEach(el => {
+  const k = el.dataset.k, numeric = el.type === 'range' || el.type === 'number';
+  el.addEventListener('input', () => {
+    let v = numeric ? +el.value : el.value;
+    if (el.type === 'number') {
+      if (!(v >= 16 && v <= 640)) return;
+      v = Math.round(v);
+    }
+    S[k] = v;
+    onChange(k);
+  });
+  if (el.type === 'number') el.addEventListener('change', () => { el.value = S[k]; });
+});
+
+view.addEventListener('click', e => {
+  const r = view.getBoundingClientRect();
+  const x = (e.clientX - r.left) * S.w / r.width, y = (e.clientY - r.top) * S.h / r.height;
+  if (e.shiftKey || e.altKey) {
+    let best = -1, bd = (S.sSize * 1.2) ** 2;
+    stuck.forEach((s, i) => { const d = (s.x - x) ** 2 + (s.y - y) ** 2; if (d < bd) { bd = d; best = i; } });
+    if (best >= 0) stuck.splice(best, 1);
+  } else {
+    const t = (fi % S.frames) / S.frames;
+    stuck.push(makeSparkle(x, y, Math.random, ((0.25 - t) % 1 + 1) % 1));
+  }
+  updateOutputs();
+  draw();
+});
+
+$('#unstick').addEventListener('click', () => { stuck = []; updateOutputs(); draw(); });
+$('#shuffle').addEventListener('click', () => { S.seed = Math.random() * 1e9 | 0; draw(); });
+$('#pause').addEventListener('click', e => {
+  paused = !paused;
+  e.currentTarget.setAttribute('aria-pressed', String(paused));
+  e.currentTarget.textContent = paused ? '▶ play' : '⏸ pause';
+});
+
+function loadPhoto(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const img = new Image();
+  img.onload = () => {
+    photo = img;
+    photoId++;
+    S.bg = 'photo';
+    markChips('bg');
+    onChange('bg');
+  };
+  img.src = URL.createObjectURL(file);
+}
+$('#pickPhoto').addEventListener('click', () => $('#photoIn').click());
+$('#photoIn').addEventListener('change', e => loadPhoto(e.target.files[0]));
+$('#matchPhoto').addEventListener('click', () => {
+  if (!photo) return;
+  const k = 400 / Math.max(photo.naturalWidth, photo.naturalHeight);
+  S.w = clamp(Math.round(photo.naturalWidth * k), 16, 640);
+  S.h = clamp(Math.round(photo.naturalHeight * k), 16, 640);
+  syncControls();
+  onChange('w');
+});
+wrap.addEventListener('dragover', e => { e.preventDefault(); wrap.classList.add('drop'); });
+wrap.addEventListener('dragleave', () => wrap.classList.remove('drop'));
+wrap.addEventListener('drop', e => {
+  e.preventDefault();
+  wrap.classList.remove('drop');
+  loadPhoto(e.dataTransfer.files[0]);
+});
+
+$('#surprise').addEventListener('click', () => {
+  const fills = Object.keys(FILLS);
+  S.font = pick(FONTS)[0];
+  S.fill = pick(fills);
+  S.effect = pick(['none', 'shadow', '3d', 'glow', 'glow']);
+  S.outlineColor = pick(['#ffffff', '#ffffff', '#000000', '#ff2d95', '#6a2cff', '#00b7ff', '#ffe600']);
+  S.shape = pick([...SHAPES, 'mix']);
+  S.sColor = pick(['white', 'white', 'match', 'rainbow', 'gold', 'pink']);
+  S.bg = pick(photo ? ['photo', 'stars', 'gradient', 'glitter', 'transparent'] : ['stars', 'gradient', 'glitter', 'transparent', 'color']);
+  S.gradient = pick(Object.keys(GRADIENTS));
+  S.bgFill = pick(fills.filter(f => f !== S.fill));
+  S.bgColor = pick(['#ffe1f2', '#e6dcff', '#d8f3ff', '#fff6c9', '#111111']);
+  S.border = Math.random() < 0.35 ? pick(fills) : 'none';
+  S.where = Math.random() < 0.3 ? 'text' : 'all';
+  S.seed = Math.random() * 1e9 | 0;
+  syncControls();
+  onChange('font');
+});
+
+const tick = () => new Promise(r => setTimeout(r, 0));
+const fmtKB = n => n < 1024 * 1024 ? `${Math.round(n / 1024)} KB` : `${(n / 1048576).toFixed(1)} MB`;
+const fileName = () => (S.text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30) || 'sparkle') + '-sparkle.gif';
+
+$('#make').addEventListener('click', async e => {
+  const btn = e.currentTarget, label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '✨ baking glitter…';
+  await tick();
+  try {
+    const c = blank(), ctx = c.getContext('2d', { willReadFrequently: true });
+    const frames = [];
+    for (let i = 0; i < S.frames; i++) {
+      render(ctx, i / S.frames);
+      frames.push(ctx.getImageData(0, 0, S.w, S.h).data);
+      if (i % 4 === 3) await tick();
+    }
+    const blob = new Blob([encodeGif(frames, S.w, S.h, delayCs())], { type: 'image/gif' });
+    if (outUrl) URL.revokeObjectURL(outUrl);
+    outUrl = URL.createObjectURL(blob);
+    const img = $('#out');
+    img.src = outUrl;
+    img.style.width = view.style.width;
+    img.classList.toggle('px', view.classList.contains('px'));
+    $('#dl').href = outUrl;
+    $('#dl').download = fileName();
+    $('#meta').textContent = `${S.w}×${S.h} · ${S.frames} frames · ${fmtKB(blob.size)}`;
+    $('#result').hidden = false;
+    $('#result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+});
+
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  let last = 0;
+  const glyphs = ['✦', '✧', '⋆', '★', '♥'], colors = ['#ff4fa8', '#b79bff', '#5fd6ff', '#ffd25f', '#ff8fd0'];
+  addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse' || e.timeStamp - last < 45) return;
+    last = e.timeStamp;
+    const s = document.createElement('span');
+    s.className = 'trail';
+    s.textContent = pick(glyphs);
+    s.style.left = e.clientX + 6 + 'px';
+    s.style.top = e.clientY + 6 + 'px';
+    s.style.color = pick(colors);
+    s.style.setProperty('--dx', (Math.random() * 30 - 15).toFixed(0) + 'px');
+    document.body.append(s);
+    s.addEventListener('animationend', () => s.remove());
+  });
+}
+
+document.fonts.addEventListener('loadingdone', () => { fontsVersion++; draw(); });
+new ResizeObserver(syncSize).observe(wrap);
+syncControls();
+syncSize();
+loadFont(S.font);
+draw();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
