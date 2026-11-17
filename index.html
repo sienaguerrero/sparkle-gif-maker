@@ -148,9 +148,13 @@ textarea:focus,input:focus-visible,select:focus-visible{outline:3px solid #b79bf
         </div>
         <div class="field"><span class="lbl" id="l-font">font</span><div class="chips" data-group="font" role="group" aria-labelledby="l-font"></div></div>
         <div class="field"><span class="lbl" id="l-fill">fill</span><div class="chips" data-group="fill" role="group" aria-labelledby="l-fill"></div></div>
+        <div class="field"><span class="lbl" id="l-glitter">glitter</span><div class="chips" data-group="glitter" role="group" aria-labelledby="l-glitter"></div></div>
         <div class="row">
           <div class="field"><label for="scale">text size <output id="o-scale"></output></label><input type="range" id="scale" data-k="scale" min="30" max="100" step="1"></div>
           <div class="field"><label for="grain">glitter grain <output id="o-grain"></output></label><input type="range" id="grain" data-k="grain" min="1" max="4" step="1"></div>
+        </div>
+        <div class="row" id="f-density">
+          <div class="field"><label for="density">noise density <output id="o-density"></output></label><input type="range" id="density" data-k="density" min="10" max="90" step="5"></div>
         </div>
         <div class="row">
           <div class="field"><label for="outline">outline <output id="o-outline"></output></label><input type="range" id="outline" data-k="outline" min="0" max="10" step="1"></div>
@@ -282,9 +286,10 @@ const SIZES = [
 ];
 
 const SHAPES = ['twinkle', 'burst', 'star', 'heart', 'pixel'];
+const NOISE_FIELDS = 3;
 
 const S = {
-  text: 'xoxo', font: 'Pacifico', fill: 'pink', scale: 90, grain: 2, outline: 4, outlineColor: '#ffffff', effect: 'glow',
+  text: 'xoxo', font: 'Pacifico', fill: 'pink', glitter: 'twinkle', density: 40, scale: 90, grain: 2, outline: 4, outlineColor: '#ffffff', effect: 'glow',
   shape: 'twinkle', sColor: 'white', amount: 18, sSize: 30, where: 'all',
   bg: 'stars', bgColor: '#ffe1f2', gradient: 'bubblegum', bgFill: 'purple', fit: 'cover', border: 'none',
   w: 400, h: 200, frames: 12, delay: 90, seed: 20021,
@@ -322,28 +327,45 @@ function cells(name, seed) {
     const rnd = mulberry32(seed);
     const g = S.grain, cw = Math.ceil(S.w / g), ch = Math.ceil(S.h / g), n = cw * ch;
     const phase = new Float32Array(n), speed = new Uint8Array(n), base = new Float32Array(n), flash = new Uint8Array(n);
+    const noise = new Uint8Array(n * NOISE_FIELDS);
     for (let i = 0; i < n; i++) {
       phase[i] = rnd();
       speed[i] = 1 + (rnd() * 3 | 0);
       base[i] = rnd();
       flash[i] = rnd() < 0.07 ? 1 : 0;
     }
-    return { g, cw, ch, phase, speed, base, flash };
+    for (let i = 0; i < noise.length; i++) noise[i] = rnd() * 256;
+    return { g, cw, ch, n, phase, speed, base, flash, noise };
   });
 }
 
 function paintGlitter(img, c, f, t) {
   const d = img.data, W = img.width, H = img.height, { g, cw, ch } = c;
   const [dr, dg, db] = f.d, [lr, lg, lb] = f.l;
-  const rainbow = f.kind === 'rainbow';
+  const rainbow = f.kind === 'rainbow', noisy = S.glitter === 'noise';
+  const field = (Math.round(t * S.frames) % NOISE_FIELDS) * c.n, dark = 1 - S.density / 100;
   for (let cy = 0; cy < ch; cy++) {
     for (let cx = 0; cx < cw; cx++) {
       const i = cy * cw + cx;
-      const s = Math.sin(TAU * (c.speed[i] * t + c.phase[i]));
-      const tw = 0.5 + 0.5 * s;
-      const v = 0.3 * c.base[i] + 0.7 * tw * tw;
+      let v, white;
+      if (noisy) {
+        const u = c.noise[field + i] / 255;
+        if (u < dark) {
+          v = 0.12 + 0.33 * u / dark;
+          white = false;
+        } else {
+          const w = (u - dark) / (1 - dark);
+          v = 0.55 + 0.45 * w;
+          white = w > 0.88;
+        }
+      } else {
+        const s = Math.sin(TAU * (c.speed[i] * t + c.phase[i]));
+        const tw = 0.5 + 0.5 * s;
+        v = 0.3 * c.base[i] + 0.7 * tw * tw;
+        white = (c.flash[i] && s > 0.55) || v > 0.93;
+      }
       let r, gg, b;
-      if ((c.flash[i] && s > 0.55) || v > 0.93) {
+      if (white) {
         r = gg = b = 255;
       } else if (rainbow) {
         [r, gg, b] = hsl((cx / cw * 0.85 + cy / ch * 0.15 + t) % 1, 1, 0.28 + 0.55 * v);
@@ -896,7 +918,7 @@ function syncSize() {
 }
 
 const FMT = {
-  scale: v => v + '%', grain: v => v + 'px', outline: v => v ? v + 'px' : 'off',
+  scale: v => v + '%', grain: v => v + 'px', density: v => v + '%', outline: v => v ? v + 'px' : 'off',
   amount: v => v, sSize: v => v + 'px', frames: v => v, delay: v => v + 'ms',
 };
 function updateOutputs() {
@@ -909,6 +931,7 @@ function updateOutputs() {
 
 function showRows() {
   $$('[data-show]').forEach(el => { el.hidden = !el.dataset.show.split(' ').includes(S.bg); });
+  $('#f-density').hidden = S.glitter !== 'noise';
 }
 
 function matchPreset() {
@@ -934,7 +957,7 @@ function loadFont(name) {
 
 function onChange(k) {
   if (k === 'font') loadFont(S.font);
-  if (k === 'bg') showRows();
+  if (k === 'bg' || k === 'glitter') showRows();
   if (k === 'w' || k === 'h') $('#preset').value = matchPreset();
   updateOutputs();
   syncSize();
@@ -985,6 +1008,7 @@ function chips(group, items) {
 const fillItems = Object.entries(FILLS).map(([v, f]) => ({ v, label: f.label, swatch: swatchCss(f) }));
 chips('font', FONTS.map(([v, px]) => ({ v, label: v, style: `font-family:${fontCss(v).replace(/"/g, "'")};font-size:${px}px` })));
 chips('fill', fillItems);
+chips('glitter', [['twinkle', '✦ twinkle'], ['noise', '▦ noise']].map(([v, label]) => ({ v, label })));
 chips('effect', [['none', 'none'], ['shadow', 'shadow'], ['3d', '3D'], ['glow', 'glow']].map(([v, label]) => ({ v, label })));
 chips('shape', [['twinkle', '✦ twinkle'], ['burst', '✷ burst'], ['star', '★ star'], ['heart', '♥ heart'], ['pixel', '✚ pixel'], ['mix', '✺ mix']].map(([v, label]) => ({ v, label })));
 chips('sColor', [['white', 'white'], ['match', 'match fill'], ['rainbow', 'rainbow'], ['gold', 'gold'], ['pink', 'hot pink']].map(([v, label]) => ({ v, label })));
@@ -1080,6 +1104,8 @@ $('#surprise').addEventListener('click', () => {
   const fills = Object.keys(FILLS);
   S.font = pick(FONTS)[0];
   S.fill = pick(fills);
+  S.glitter = pick(['twinkle', 'twinkle', 'noise']);
+  S.density = pick([25, 40, 40, 60]);
   S.effect = pick(['none', 'shadow', '3d', 'glow', 'glow']);
   S.outlineColor = pick(['#ffffff', '#ffffff', '#000000', '#ff2d95', '#6a2cff', '#00b7ff', '#ffe600']);
   S.shape = pick([...SHAPES, 'mix']);
